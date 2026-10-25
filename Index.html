@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Bladi | منصة شات بلادي الاحترافية المتكاملة</title>
+    <!-- استيراد الخطوط والأيقونات الاحترافية -->
+    <link rel="stylesheet" href="https://cloudflare.com">
+    <link href="https://googleapis.com" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #7822ec;
+            --primary-light: #f3ebff;
+            --primary-dark: #5b17b6;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --bg-main: #f4f6f9;
+            --bg-card: #ffffff;
+            --text-main: #2d3748;
+            --text-muted: #718096;
+            --border-color: #e2e8f0;
+            --sidebar-width: 280px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* بوابة التسجيل المتطورة */
+        .auth-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(120,34,236,0.95), rgba(91,23,182,0.95));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: all 0.4s ease;
+        }
+
+        .auth-card {
+            background: var(--bg-card);
+            padding: 35px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .auth-header i {
+            font-size: 45px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            text-align: right;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-main);
+        }
+
+        .form-group input, .form-group select {
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            outline: none;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(120,34,236,0.15);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-submit:hover { background: var(--primary-dark); }
+
+        /* الهيكل والتنظيم الأساسي */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-card);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+        }
+
+        .brand-space {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--primary);
+            font-size: 22px;
+            font-weight: 700;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .menu-list {
+            list-style: none;
+            margin-top: 20px;
+        }
+
+        .menu-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 5px;
+            transition: 0.2s;
+        }
+
+        .menu-link:hover, .menu-link.active {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .menu-link.admin-btn {
+            color: var(--danger);
+            margin-top: 15px;
+            border: 1px dashed var(--danger);
+        }
+
+        .menu-link.admin-btn:hover {
+            background: #fdf2f2;
+        }
+
+        .profile-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .main-layout {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        /* مساحات إعلانات أدسينس المحمية وضمان أعلى نقر */
+        .adsense-space {
+            background: #f8f9fa;
+            border: 1px dashed #cbd5e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 12px;
+            overflow: hidden;
+        }
+
+        .ads-top {
+            width: 100%;
+            height: 90px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .ads-sidebar {
+            width: 100%;
+            height: 200px;
+            margin-top: 15px;
+            border-radius: 8px;
+        }
+
+        /* إدارة الأقسام والشاشات */
+        .app-view {
+            display: none;
+            padding: 25px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .app-view.view-active {
+            display: block;
+        }
+
+        /* شاشة تصفح الأعضاء والتطابق والتوافق الاجتماعي */
+        .match-engine {
+            max-width: 420px;
+            margin: 20px auto;
+            background: var(--bg-card);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .match-photo {
+            height: 320px;
+            background: linear-gradient(45deg, #7822ec, #a855f7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 70px;
+        }
+
+        .match-details {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .match-ctrls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding-bottom: 25px;
+        }
+
+        .ctrl-btn {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: 0.2s;
+        }
+
+        .ctrl-pass { background: #fff; color: var(--danger); border: 1px solid #ffccd5; }
+        .ctrl-love { background: var(--primary); color: #fff; }
+        .ctrl-btn:hover { transform: scale(1.08); }
+
+        /* غرف ومحادثات الشات الفوري */
+        .messenger-box {
+            display: flex;
+            height: 100%;
+            background: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .threads-list {
+            width: 280px;
+            border-left: 1px solid var(--border-color);
+            overflow-y: auto;
+        }
+
+        .thread-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        .thread-item:hover, .thread-item.active-thread { background: var(--primary-light); }
+
+        .chat-hub {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f7fafc;
+        }
+
+        .chat-hub-header {
+            background: var(--bg-card);
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-feed {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .msg-bubble {
+            max-width: 65%;
+            padding: 10px 16px;
+            border-radius: 16px;
+            font-size: 14.5px;
+            line-height: 1.5;
+        }
+
+        .msg-bubble.outgoing {
+            background: var(--primary);
+            color: #fff;
+            align-self: flex-start;
+            border-top-right-radius: 0;
+        }
+
+        .msg-bubble.incoming {
+            background: #fff;
+            color: var(--text-main);
+            align-self: flex-end;
+            border-top-left-radius: 0;
+            border: 1px solid var(--border-color);
+        }
+
+        .chat-sender-area {
